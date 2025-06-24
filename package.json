@@ -2,7 +2,7 @@
   "name": "api.kerjadiluar",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/server.js",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -16,7 +16,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "npx tsc -w",
+    "start": "node ./dist/server.js",
     "dev": "npx nodemon",
     "build": "tsc"
   },
