@@ -33,3 +33,26 @@ export const getUsersHandler = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) {
+      res.status(400).json({ message: 'User ID is required' });
+      return;
+    }
+
+    const users = await getUsers({ roleId: undefined, name: undefined });
+    const user = users.find(u => u.id === userId);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.json({ success: true, data: user });
+  } catch (error: any) {
+    next(error);
+  }
+}
