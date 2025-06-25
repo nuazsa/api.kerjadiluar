@@ -13,3 +13,15 @@ export const registerUserSchema = z.object({
   roleId: z.coerce 
     .string({required_error: 'Role ID wajib diisi'})
 });
+
+export const loginUserSchema = z.object({
+  email: z
+    .string({ required_error: 'Email wajib diisi' })
+    .email('Format email tidak valid'),
+  password: z
+    .string({ required_error: 'Password wajib diisi' })
+    .min(8, 'Password minimal harus 8 karakter'),
+  loginType: z.enum(['main', 'backoffice'], {
+    required_error: 'Tipe login wajib diisi',
+  }),
+});
