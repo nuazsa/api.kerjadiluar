@@ -19,12 +19,16 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "npx nodemon",
     "start": "node ./dist/server.js",
     "generate": "npx prisma generate",
-    "migrate": "npx prisma migrate dev"
+    "migrate": "npx prisma migrate dev",
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
