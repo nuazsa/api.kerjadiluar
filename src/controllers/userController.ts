@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { createUser, getAllUsers } from '../services/userService';
+import { createUser, getUsers } from '../services/userService';
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -19,10 +19,16 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const listUsers = async (_: Request, res: Response, next: NextFunction) => {
+export const getUsersHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await getAllUsers();
-    res.json(users);
+    const { roleId, name } = req.query;
+
+    const users = await getUsers({
+      roleId: roleId as string | undefined,
+      name: name as string | undefined,
+    });
+
+    res.json({ success: true, data: users });
   } catch (error: any) {
     next(error);
   }
