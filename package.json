@@ -26,7 +26,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc && prisma db push",
     "dev": "npx nodemon",
     "start": "node ./dist/server.js",
     "generate": "npx prisma generate",
