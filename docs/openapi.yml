@@ -1,0 +1,314 @@
+openapi: '3.0.3'
+info:
+  title: Kerjadiluar API Spec
+  version: '1.0.0'
+  description: Spesifikasi API untuk layanan Kerjadiluar.
+servers:
+  - url: http://localhost:8000/api
+    description: Server lokal untuk pengembangan
+  - url: https://api-kerjadiluar.vercel.app/api
+    description: Server staging
+tags:
+  - name: Auth
+    description: Operasi terkait autentikasi, login, dan registrasi.
+  - name: User
+    description: Operasi untuk mengelola data pengguna.
+
+# ===============================================================
+#  Reusable Components
+# ===============================================================
+components:
+  schemas:
+    # --- Model Objek Dasar ---
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'rl1'
+        name:
+          type: string
+          example: 'PENGGUNA'
+    UserPublic:
+      type: object
+      description: Representasi data user yang aman untuk ditampilkan.
+      properties:
+        id:
+          type: string
+          example: 'clx123abc456'
+        name:
+          type: string
+          example: 'Brendan Eich'
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+
+    # --- Request Bodies ---
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        loginType:
+          type: string
+          enum: ['main', 'backoffice']
+          description: Opsional, akan ditentukan dari origin jika tidak ada.
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - roleId
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        roleId:
+          type: string
+          description: ID dari role yang akan diassign.
+
+    # --- Response Bodies ---
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: JWT untuk request terotentikasi.
+            user:
+              $ref: '#/components/schemas/UserPublic'
+    UserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/UserPublic'
+    UserListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPublic'
+
+    # --- Error ---
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+
+  responses:
+    BadRequest:
+      description: '400 Bad Request. Data yang dikirim tidak valid.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: '401 Unauthorized. Token tidak valid atau tidak ada.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: '403 Forbidden. Anda tidak memiliki hak akses untuk sumber daya ini.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: '404 Not Found. Sumber daya yang diminta tidak ditemukan.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: '409 Conflict. Data yang dikirim sudah ada (misal: email duplikat).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+# ===============================================================
+#  Paths
+# ===============================================================
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrasi user baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registrasi berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/google:
+    get:
+      tags: [Auth]
+      summary: Memulai alur login dengan Google
+      responses:
+        '302':
+          description: Redirect ke halaman autentikasi Google.
+          headers:
+            Location:
+              schema:
+                type: string
+
+  /auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Callback dari Google setelah autentikasi
+      description: Endpoint ini akan menerima redirect dari Google dan mengembalikan token jika berhasil.
+      responses:
+        '200':
+          description: Login dengan Google berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Mendapatkan profil user yang sedang login
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Berhasil mengambil data profil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users:
+    get:
+      tags: [User]
+      summary: Mendapatkan daftar semua user (memerlukan hak akses)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          schema: { type: string }
+          description: Filter berdasarkan nama user.
+        - name: roleId
+          in: query
+          schema: { type: string }
+          description: Filter berdasarkan ID role.
+      responses:
+        '200':
+          description: Berhasil mengambil daftar user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{id}:
+    get:
+      tags: [User]
+      summary: Mendapatkan data user berdasarkan ID (memerlukan hak akses)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Berhasil mengambil data user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
