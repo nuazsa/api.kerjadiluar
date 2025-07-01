@@ -1,8 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
-import { loginService } from '../services/authService';
+import { createUser, loginService } from '../services/authService';
 import prisma from '../config/db';
 import { User } from '@prisma/client';
 import { generateAuthToken } from '../utils/jwt';
+
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, email, password, roleId } = req.body;
+
+    const user = await createUser(name, email, password, roleId);
+
+    res.status(201).json({
+      success: true,
+      message: 'User berhasil dibuat',
+      data: user,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
 
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -10,17 +26,11 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     let { loginType } = req.body;
 
     if (!loginType) {
-      const origin = req.headers.origin || req.hostname || '';
+      const origin = req.headers.origin || '';
       if (origin.includes('backoffice.kerjadiluar.id')) {
         loginType = 'backoffice';
-      } else if (origin.includes('kerjadiluar.id')) {
-        loginType = 'main';
       } else {
-        res.status(400).json({
-          success: false,
-          message: 'Tidak dapat menentukan tipe login dari origin.'
-        });
-        return;
+        loginType = 'main';
       }
     }
 
@@ -28,10 +38,11 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
     res.json({
       success: true,
+      message: `Login berhasil sebagai ${result.user.name}`,
       data: result,
     });
   } catch (error: any) {
-    next(error)
+    next(error);
   }
 };
 

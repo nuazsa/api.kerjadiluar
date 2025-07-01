@@ -20,8 +20,5 @@ export const loginUserSchema = z.object({
     .email('Format email tidak valid'),
   password: z
     .string({ required_error: 'Password wajib diisi' })
-    .min(8, 'Password minimal harus 8 karakter'),
-  loginType: z.enum(['main', 'backoffice'], {
-    required_error: 'Tipe login wajib diisi',
-  }),
+    .min(8, 'Password minimal harus 8 karakter')
 });

@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import passport from '../config/passport';
 import { validate } from '../middlewares/validate.middleware';
-import { loginUserSchema } from '../validations/user.validation';
-import { googleLoginCallback, googleLoginFailed, loginUser } from '../controllers/authController';
+import { loginUserSchema, registerUserSchema } from '../validations/user.validation';
+import { googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/authController';
 
 const router = Router();
 
 router.post('/login', validate(loginUserSchema), loginUser);
+
+router.post('/register', validate(registerUserSchema), registerUser);
 
 router.get('/google',
   passport.authenticate('google', {
