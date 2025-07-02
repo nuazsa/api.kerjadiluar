@@ -10,7 +10,11 @@ export const getUsersHandler = async (req: Request, res: Response, next: NextFun
       name: name as string | undefined,
     });
 
-    res.json({ success: true, data: users });
+    res.json({ 
+      success: true, 
+      message: 'Berhasil mendapatkan data user',
+      data: users 
+    });
   } catch (error: any) {
     next(error);
   }
@@ -33,7 +37,11 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    res.json({ success: true, data: user });
+    res.json({ 
+      success: true,
+      message: 'Berhasil mendapatkan data user',
+      data: user 
+    });
   } catch (error: any) {
     next(error);
   }
