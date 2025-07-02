@@ -39,7 +39,7 @@ model Role {
 
 model UserRole {
   id         String    @id @default(cuid())
-  user       User      @relation(fields: [user_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    String
   role       Role      @relation(fields: [role_id], references: [id])
   role_id    String

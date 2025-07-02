@@ -39,3 +39,27 @@ export const getUsers = async (filters: { roleId?: string; name?: string }) => {
     select: userPublicData,
   });
 };
+
+interface UserUpdatePayload {
+  name?: string;
+  email?: string;
+}
+
+export const updateUser = async (id: string, data: UserUpdatePayload) => {
+  return prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: data,
+    select: userPublicData,
+  });
+};
+
+export const deleteUser = async (id: string) => {
+  return prisma.user.delete({
+    where: {
+      id: id,
+    },
+    select: userPublicData,
+  });
+};

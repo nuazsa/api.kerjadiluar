@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { getUsers } from '../services/userService';
+import { deleteUser, getUsers, updateUser } from '../services/userService';
 
 export const getUsersHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -46,3 +46,45 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 }
+
+export const updateUserHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.params.id;
+    const updateData = req.body;
+
+    if (Object.keys(updateData).length === 0) {
+      res.status(400).json({ success: false, message: 'Tidak ada data untuk diupdate' });
+      return;
+    }
+
+    const updatedUserResult = await updateUser(userId, updateData);
+    
+    const transformedUser = {
+      ...updatedUserResult,
+      roles: updatedUserResult.roles.map(r => r.role),
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'User berhasil diupdate',
+      data: transformedUser,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const deleteUserHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.params.id;
+    
+    await deleteUser(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'User berhasil dihapus',
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
