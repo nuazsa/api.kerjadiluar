@@ -1,24 +1,28 @@
 import { z } from 'zod';
 
-export const registerUserSchema = z.object({
-  name: z
-    .string({ required_error: 'Nama wajib diisi' })
-    .min(3, 'Nama minimal harus 3 karakter'),
-  email: z
-    .string({ required_error: 'Email wajib diisi' })
-    .email('Format email tidak valid'),
-  password: z
-    .string({ required_error: 'Password wajib diisi' })
-    .min(8, 'Password minimal harus 8 karakter'),
-  roleId: z.coerce 
-    .string({required_error: 'Role ID wajib diisi'})
+export const getUsersSchema = z.object({
+  query: z.object({
+    name: z.string().optional(),
+    roleId: z.string().optional(),
+  }),
 });
 
-export const loginUserSchema = z.object({
-  email: z
-    .string({ required_error: 'Email wajib diisi' })
-    .email('Format email tidak valid'),
-  password: z
-    .string({ required_error: 'Password wajib diisi' })
-    .min(8, 'Password minimal harus 8 karakter')
+export const userPathParamsSchema = z.object({
+  params: z.object({
+    id: z.string({
+        required_error: "User ID di dalam path URL diperlukan."
+    }),
+  }),
+});
+
+export const updateUserSchema = z.object({
+  params: userPathParamsSchema.shape.params,
+  body: z
+    .object({
+      name: z.string().min(3, 'Nama minimal harus 3 karakter').optional(),
+      email: z.string().email('Format email tidak valid').optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'Setidaknya satu field (name atau email) harus diisi untuk melakukan update.',
+    }),
 });

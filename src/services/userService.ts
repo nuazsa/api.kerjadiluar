@@ -40,10 +40,20 @@ export const getUsers = async (filters: { roleId?: string; name?: string }) => {
   });
 };
 
-interface UserUpdatePayload {
-  name?: string;
-  email?: string;
-}
+export const getSingleUser = async (id: string) => {
+  return prisma.user.findUniqueOrThrow({
+    where: { id },
+    select: userPublicData,
+  });
+};
+
+export type UserPayload = {
+  name: string;
+  email: string;
+};
+
+export type UserUpdatePayload = Partial<UserPayload>;
+
 
 export const updateUser = async (id: string, data: UserUpdatePayload) => {
   return prisma.user.update({

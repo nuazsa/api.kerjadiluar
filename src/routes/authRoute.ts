@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from '../config/passport';
 import { validate } from '../middlewares/validate.middleware';
-import { loginUserSchema, registerUserSchema } from '../validations/user.validation';
+import { loginUserSchema, registerUserSchema } from '../validations/auth.validation';
 import { googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/authController';
 
 const router = Router();
