@@ -29,6 +29,11 @@ components:
         name:
           type: string
           example: 'PENGGUNA'
+    UserRoleRelation:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/Role'
     UserPublic:
       type: object
       description: Representasi data user yang aman untuk ditampilkan.
@@ -38,7 +43,7 @@ components:
           example: 'clx123abc456'
         name:
           type: string
-          example: 'Brendan Eich'
+          example: 'Exampe User'
         email:
           type: string
           format: email
@@ -46,7 +51,7 @@ components:
         roles:
           type: array
           items:
-            $ref: '#/components/schemas/Role'
+            $ref: '#/components/schemas/UserRoleRelation'
 
     # --- Request Bodies ---
     LoginRequest:
@@ -84,6 +89,21 @@ components:
         roleId:
           type: string
           description: ID dari role yang akan diassign.
+    UserUpdateRequest:
+      type: object
+      description: Body untuk memperbarui data user. Semua field opsional.
+      properties:
+        name:
+          type: string
+          description: Nama lengkap user.
+        email:
+          type: string
+          format: email
+          description: Alamat email user.
+        password:
+          type: string
+          format: password
+          description: Kata sandi baru untuk user (opsional).
 
     # --- Response Bodies ---
     AuthResponse:
@@ -108,6 +128,8 @@ components:
         success:
           type: boolean
           example: true
+        message:
+          type: string
         data:
           $ref: '#/components/schemas/UserPublic'
     UserListResponse:
@@ -116,10 +138,21 @@ components:
         success:
           type: boolean
           example: true
+        message:
+          type: string
         data:
           type: array
           items:
             $ref: '#/components/schemas/UserPublic'
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Operasi berhasil dilakukan'
 
     # --- Error ---
     Error:
@@ -306,6 +339,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [User]
+      summary: Memperbarui data user berdasarkan ID (memerlukan hak akses)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Berhasil memperbarui data user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [User]
+      summary: Menghapus user berdasarkan ID (memerlukan hak akses)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: User berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
