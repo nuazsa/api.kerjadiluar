@@ -9,11 +9,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
 
-const swaggerPath = process.env.NODE_ENV === 'production'
-  ? path.join(__dirname, 'openapi.yml')
-  : path.join(__dirname, '../docs/openapi.yml');
-
-const swaggerDocument = YAML.load(swaggerPath);
+const swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yml'));
 
 const app: Application = express();
 
