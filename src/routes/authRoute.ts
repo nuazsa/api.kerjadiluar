@@ -2,7 +2,8 @@ import { Router } from 'express';
 import passport from '../config/passport';
 import { validate } from '../middlewares/validate.middleware';
 import { loginUserSchema, registerUserSchema } from '../validations/auth.validation';
-import { googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/authController';
+import { getMe, googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/authController';
+import { verifyJWT } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -23,6 +24,8 @@ router.get('/google/callback',
   }),
   googleLoginCallback
 );
+
+router.get('/me', verifyJWT, getMe);
 
 router.get('/login-failed', googleLoginFailed);
 

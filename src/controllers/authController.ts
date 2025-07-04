@@ -3,6 +3,7 @@ import { createUser, loginService } from '../services/authService';
 import prisma from '../config/db';
 import { User } from '@prisma/client';
 import { generateAuthToken } from '../utils/jwt';
+import { getSingleUser } from '../services/userService';
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -71,6 +72,20 @@ export const googleLoginCallback = async (req: Request, res: Response, next: Nex
           roles,
         }
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (req as any).user.id;
+    const user = await getSingleUser(userId);
+    res.json({
+      success: true,
+      message: 'Berhasil mendapatkan data profil',
+      data: user,
     });
   } catch (error) {
     next(error);
