@@ -9,9 +9,17 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
 
+const app: Application = express();
+
 const swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yml'));
 
-const app: Application = express();
+const swaggerOptions = {
+  customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+  customJs: [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js'
+  ]
+};
 
 app.use(cors());
 app.use(express.json());
@@ -45,8 +53,7 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
