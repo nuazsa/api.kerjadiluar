@@ -19,6 +19,22 @@ const userPublicData = {
   },
 };
 
+export const createSession = async (user_id: string, user_agent?: string, ip_address?: string) => {
+  const sessionDuration = 1000 * 60 * 60 * 24 * 7;
+  const expires_at = new Date(Date.now() + sessionDuration);
+
+  const session = await prisma.userSession.create({
+    data: {
+      user_id,
+      expires_at,
+      user_agent,
+      ip_address
+    }
+  });
+
+  return session;
+};
+
 export const createUser = async ( name: string, email: string, password: string, roleId: string = 'rl1' ) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -42,7 +58,8 @@ export const createUser = async ( name: string, email: string, password: string,
 export const loginService = async (
   email: string,
   password: string,
-  loginType: 'main' | 'backoffice'
+  loginType: 'main' | 'backoffice',
+  meta: { user_agent?: string; ip_address?: string }
 ) => {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -76,7 +93,9 @@ export const loginService = async (
     if (blockedOnly) throw new Error('Akun ini hanya untuk backoffice.');
   }
   
-  const token = generateAuthToken(user.id, user.name, userRoles);
+  const session = await createSession(user.id, meta.user_agent, meta.ip_address);
+  
+  const token = generateAuthToken(session.id);
 
   return {
     user: {
@@ -87,4 +106,20 @@ export const loginService = async (
     },
     token,
   };
+};
+
+export const logoutService = async (sessionId: string) => {
+  try {
+    await prisma.userSession.update({
+      where: {
+        id: sessionId
+      },
+      data: {
+        revoked_at: new Date()
+      }
+    });
+    return { message: 'Logout berhasil' };
+  } catch (error) {
+    throw new Error('Sesi tidak valid atau sudah logout.');
+  }
 };

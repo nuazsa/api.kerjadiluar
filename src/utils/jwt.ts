@@ -10,10 +10,11 @@ if (!JWT_SECRET) {
 }
 
 /**
- * Generate a JWT token for user.
+ * Generate a JWT token for a user session.
  */
-export function generateAuthToken(userId: string, name: string, roles: string[]): string {
-  const payload = { id: userId, name, roles };
+export function generateAuthToken(sessionId: string): string {
+  const payload = { sessionId };
+  // Sesuaikan masa berlaku token sesuai kebutuhan
   const expiresIn = '7d';
 
   return jwt.sign(payload, JWT_SECRET, { expiresIn });

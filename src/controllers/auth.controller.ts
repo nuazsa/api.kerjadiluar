@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createUser, loginService } from '../services/auth.service';
+import { createUser, loginService, logoutService, createSession } from '../services/auth.service';
 import prisma from '../config/db';
 import { User } from '@prisma/client';
 import { generateAuthToken } from '../utils/jwt';
@@ -35,7 +35,12 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       }
     }
 
-    const result = await loginService(email, password, loginType);
+    const meta = {
+      user_agent: req.headers['user-agent'],
+      ip_address: req.ip
+    };
+
+    const result = await loginService(email, password, loginType, meta);
 
     res.json({
       success: true,
@@ -58,7 +63,10 @@ export const googleLoginCallback = async (req: Request, res: Response, next: Nex
 
     const roles = userWithRoles?.roles.map(r => r.role.name) || [];
 
-    const token = generateAuthToken(dbUser.id, dbUser.name, roles);
+    const meta = { userAgent: req.headers['user-agent'], ipAddress: req.ip };
+    const session = await createSession(dbUser.id, meta.userAgent, meta.ipAddress);
+
+    const token = generateAuthToken(session.id);
 
     res.json({
       success: true,
@@ -95,3 +103,16 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
 export const googleLoginFailed = (req: Request, res: Response) => {
   res.status(401).json({ success: false, message: 'Login dengan Google gagal.' });
 };
+
+export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const sessionId = (req as any).user.sessionId;
+        await logoutService(sessionId);
+        res.status(200).json({
+            success: true,
+            message: 'Anda berhasil logout'
+        });
+    } catch (error) {
+        next(error);
+    }
+}

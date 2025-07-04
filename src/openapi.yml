@@ -251,6 +251,24 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+
+  /auth/logout:
+    delete:
+      tags: [Auth]
+      summary: Logout user
+      description: Mencabut sesi user yang sedang aktif dengan menandai sesi sebagai 'revoked' di database, sehingga token menjadi tidak valid.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /auth/google:
     get:
       tags: [Auth]
