@@ -2,8 +2,8 @@ import { Router } from 'express';
 import passport from '../config/passport';
 import { validate } from '../middlewares/validate.middleware';
 import { loginUserSchema, registerUserSchema } from '../validations/auth.validation';
-import { getMe, googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/authController';
-import { verifyJWT } from '../middlewares/authMiddleware';
+import { getMe, googleLoginCallback, googleLoginFailed, loginUser, registerUser } from '../controllers/auth.controller';
+import { verifyJWT } from '../middlewares/auth.middleware';
 
 const router = Router();
 

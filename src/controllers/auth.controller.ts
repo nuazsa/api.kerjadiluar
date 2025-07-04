@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { createUser, loginService } from '../services/authService';
+import { createUser, loginService } from '../services/auth.service';
 import prisma from '../config/db';
 import { User } from '@prisma/client';
 import { generateAuthToken } from '../utils/jwt';
-import { getSingleUser } from '../services/userService';
+import { getSingleUser } from '../services/user.service';
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -28,7 +28,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
     if (!loginType) {
       const origin = req.headers.origin || '';
-      if (origin.includes('backoffice.kerjadiluar.id')) {
+      if (origin.includes('backoffice.kerjadiluar.id') || origin.includes('backoffice-kerjadiluar.vercel.app')) {
         loginType = 'backoffice';
       } else {
         loginType = 'main';

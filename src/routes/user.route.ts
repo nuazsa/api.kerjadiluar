@@ -10,7 +10,7 @@ import {
   getUserById, 
   updateUserHandler, 
   deleteUserHandler 
-} from '../controllers/userController';
+} from '../controllers/user.controller';
 
 // import { verifyJWT, allowRoles, disallowRoles } from '../middlewares/authMiddleware';
 

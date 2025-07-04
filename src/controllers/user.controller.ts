@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { deleteUser, getUsers, updateUser, getSingleUser } from '../services/userService';
+import { deleteUser, getUsers, updateUser, getSingleUser } from '../services/user.service';
 
 export const getUsersHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {

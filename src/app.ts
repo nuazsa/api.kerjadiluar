@@ -2,9 +2,13 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import passport from './config/passport';
-import { errorHandler } from './middlewares/errorHandler';
-import userRoutes from './routes/userRoute';
-import authRoutes from './routes/authRoute';
+import { errorHandler } from './middlewares/error.handler';
+import userRoutes from './routes/user.route';
+import authRoutes from './routes/auth.route';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+
+const swaggerDocument = YAML.load('./docs/openapi.yml');
 
 const app: Application = express();
 
@@ -30,6 +34,18 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    message: 'Selamat Datang di API Kerjadiluar',
+    version: '1.0.0',
+    documentation: '/api-docs',
+    author: 'kerjadiluar.id'
+  });
+});
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
