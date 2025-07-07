@@ -408,7 +408,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   # --- Profile Paths ---
-  /profiles/me:
+  /profile:
     get:
       tags: [Profile]
       summary: Mendapatkan data diri (profil) pengguna yang sedang login
