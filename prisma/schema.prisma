@@ -11,7 +11,6 @@ generator client {
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -26,6 +25,20 @@ model User {
 
   roles      UserRole[]
   sessions   UserSession[]
+  profile   UserProfile?
+}
+
+model UserProfile {
+  user_id             String        @id
+  whatsapp_number     String?   
+  location            String?
+  date_of_birth       DateTime?
+  last_education      String?
+  profile_picture_url String?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime?
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Role {

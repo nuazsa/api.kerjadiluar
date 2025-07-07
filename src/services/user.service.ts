@@ -15,6 +15,15 @@ const userPublicData = {
       },
     },
   },
+  profile: {
+    select: {
+      whatsapp_number: true,
+      location: true,
+      date_of_birth: true,
+      last_education: true,
+      profile_picture_url: true,
+    }
+  }
 };
 
 export const getUsers = async (filters: { roleId?: string; name?: string }) => {

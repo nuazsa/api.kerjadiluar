@@ -3,6 +3,7 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from './config/passport';
 import { errorHandler } from './middlewares/error.handler';
+import profileRoutes from './routes/profile.route';
 import userRoutes from './routes/user.route';
 import authRoutes from './routes/auth.route';
 import swaggerUi from 'swagger-ui-express';
@@ -55,6 +56,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
+app.use('/api/profile', profileRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
